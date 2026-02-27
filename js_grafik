@@ -1,86 +1,85 @@
 // Ambil data dari Django
-// Ambil data dari Django
 var grafikData = JSON.parse('{{ grafik_dept_data|escapejs }}');
 
-// ⭐ SORTIR: tertinggi → terendah
+// ⭐ SORTIR: tertinggi → terendah (berdasarkan jumlah_hadir)
 grafikData.sort((a, b) => parseFloat(b.jumlah_hadir) - parseFloat(a.jumlah_hadir));
 
-// Labels & data
+// Labels & data dari hasil sorting
 var departmentLabels = grafikData.map(item => item.department);
 var dataAktual = grafikData.map(item => parseFloat(item.jumlah_hadir));
 
-    // Labels & data
-    var departmentLabels = grafikData.map(item => item.department);
-    var dataAktual = grafikData.map(item => parseFloat(item.jumlah_hadir));
+// Target statis di 95 untuk semua departemen
+var targetValues = Array(departmentLabels.length).fill(95);
 
-    // Target statis
-    var targetValues = Array(departmentLabels.length).fill(95);
+// Warna batang: MERAH jika < 95, BIRU jika ≥ 95
+var barColors = dataAktual.map(val => val < 95 ? '#ff1900' : '#0068f0');
 
-    // Warna batang dinamis
-    var barColors = dataAktual.map(val => val < 95 ? '#ff1900' : '#0068f0'); 
-    // merah : hijau
-
-    var options = {
-        series: [
-            {
-                name: 'Aktual',
-                type: 'column',
-                data: dataAktual
-            },
-            {
-                name: 'Target',
-                type: 'line',
-                data: targetValues
-            }
-        ],
-        chart: {
-            height: 450,
+var options = {
+    series: [
+        {
+            name: 'Aktual',
+            type: 'column',
+            data: dataAktual
+        },
+        {
+            name: 'Target',
             type: 'line',
-            stacked: false
-        },
-        plotOptions: {
-            bar: {
-                columnWidth: '50%',
-                distributed: true   
-            }
-        },
-        colors: barColors,
-        stroke: {
-            width: [0, 3],
-            curve: 'smooth'
-        },
-        labels: departmentLabels,
-        xaxis: {
-            categories: departmentLabels,
-            labels: {
-                rotate: -90,   
-                style: {
-                    fontSize: '11px'
-                }
-            }
-        },
-        yaxis: {
-            min: 50,
-            max: 100,
-            title: {
-                text: 'Kehadiran (%)'
-            },
-            labels: {
-                formatter: val => val.toFixed(2) + "%"
-            }
-        },
-        tooltip: {
-            shared: true,
-            intersect: false,
-            y: {
-                formatter: val => val.toFixed(2) + "%"
+            data: targetValues
+        }
+    ],
+    chart: {
+        height: 450,
+        type: 'line',
+        stacked: false
+    },
+    plotOptions: {
+        bar: {
+            columnWidth: '50%',
+            distributed: true // Memungkinkan warna berbeda per batang
+        }
+    },
+    colors: barColors, // Warna untuk batang (akan diabaikan untuk line)
+    stroke: {
+        width: [0, 3], // 0 untuk batang (tanpa stroke), 3 untuk line
+        curve: 'smooth'
+    },
+    // Warna khusus untuk line target (hijau)
+    colors: barColors, // Ini untuk batang
+    // Untuk line target, kita set di sini:
+    stroke: {
+        width: [0, 3],
+        curve: 'smooth',
+        colors: ['#0068f0', '#00E396'] // Biru untuk batang (diabaikan), Hijau untuk line
+    },
+    labels: departmentLabels,
+    xaxis: {
+        categories: departmentLabels,
+        labels: {
+            rotate: -90, // Rotate 90 derajat ke bawah
+            style: {
+                fontSize: '11px'
             }
         }
-    };
+    },
+    yaxis: {
+        min: 50,
+        max: 100,
+        title: {
+            text: 'Kehadiran (%)'
+        },
+        labels: {
+            formatter: val => val.toFixed(2) + "%"
+        }
+    },
+    tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+            formatter: val => val.toFixed(2) + "%"
+        }
+    }
+};
 
-    // Render chart
-    var chart = new ApexCharts(document.querySelector("#dept_chart"), options);
-    chart.render();
-
-
-perbaiki ini agar diagram batang disortir berdasarkan tertinggi ke terendah, kehadairan dengan nilain kurang dari 95 merah, 95 atau lebih biru. target berupa grafik line di 95 dengan warna hijau. nama departmen panjang ke bawah atau rotate -90
+// Render chart
+var chart = new ApexCharts(document.querySelector("#dept_chart"), options);
+chart.render();
