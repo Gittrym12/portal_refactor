@@ -12,7 +12,7 @@ var dataAktual = grafikData.map(item => parseFloat(item.jumlah_hadir));
 var targetValues = Array(departmentLabels.length).fill(95);
 
 // Warna batang: MERAH jika < 95, BIRU jika ≥ 95
-var barColors = dataAktual.map(val => val < 95 ? '#ff1900' : '#0068f0');
+var barColors = dataAktual.map(val => val < 95 ? '#FF5252' : '#42A5F5');
 
 var options = {
     series: [
@@ -22,19 +22,169 @@ var options = {
             data: dataAktual
         },
         {
-            name: 'Target',
+            name: 'Target 95%',
             type: 'line',
             data: targetValues
         }
     ],
     chart: {
-        height: 450,
+        height: 500,
         type: 'line',
-        stacked: false
+        stacked: false,
+        background: '#1E1E1E', // Background gelap
+        foreColor: '#FFFFFF', // Warna teks putih
+        toolbar: {
+            show: true,
+            tools: {
+                download: true,
+                selection: false,
+                zoom: false,
+                zoomin: false,
+                zoomout: false,
+                pan: false,
+                reset: false
+            }
+        }
     },
     plotOptions: {
         bar: {
-            columnWidth: '50%',
+            columnWidth: '60%',
+            distributed: true,
+            borderRadius: 4, // Sedikit rounded pada batang
+            dataLabels: {
+                position: 'top' // Posisi label di atas batang
+            }
+        }
+    },
+    colors: barColors,
+    dataLabels: {
+        enabled: true,
+        enabledOnSeries: [0], // Hanya untuk series pertama (aktual)
+        formatter: function(val) {
+            return val.toFixed(1) + '%';
+        },
+        style: {
+            fontSize: '10px',
+            colors: ['#FFFFFF']
+        },
+        offsetY: -20,
+        background: {
+            enabled: true,
+            foreColor: '#FFFFFF',
+            borderRadius: 2,
+            padding: 4,
+            opacity: 0.8,
+            borderWidth: 0
+        }
+    },
+    stroke: {
+        width: [0, 3],
+        curve: 'smooth',
+        colors: ['#42A5F5', '#4CAF50'] // Warna line target hijau
+    },
+    markers: {
+        size: [0, 6],
+        colors: ['#42A5F5', '#4CAF50'],
+        strokeColors: ['#42A5F5', '#4CAF50'],
+        strokeWidth: [0, 2],
+        hover: {
+            size: [0, 8]
+        }
+    },
+    labels: departmentLabels,
+    xaxis: {
+        categories: departmentLabels,
+        labels: {
+            rotate: -45, // Rotate 45 derajat
+            rotateAlways: true,
+            style: {
+                fontSize: '10px',
+                colors: '#FFFFFF',
+                fontWeight: 500
+            }
+        },
+        axisBorder: {
+            color: '#333333'
+        },
+        axisTicks: {
+            color: '#333333'
+        },
+        title: {
+            text: 'Departemen',
+            style: {
+                color: '#FFFFFF',
+                fontSize: '12px'
+            }
+        }
+    },
+    yaxis: {
+        min: 0,
+        max: 105,
+        tickAmount: 7,
+        title: {
+            text: 'Kehadiran (%)',
+            style: {
+                color: '#FFFFFF',
+                fontSize: '12px'
+            }
+        },
+        labels: {
+            formatter: val => val.toFixed(0) + '%',
+            style: {
+                colors: '#FFFFFF'
+            }
+        },
+        axisBorder: {
+            color: '#333333'
+        },
+        grid: {
+            color: '#333333',
+            borderColor: '#333333'
+        }
+    },
+    tooltip: {
+        theme: 'dark',
+        shared: true,
+        intersect: false,
+        y: {
+            formatter: val => val.toFixed(2) + '%'
+        }
+    },
+    legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+        labels: {
+            colors: '#FFFFFF'
+        },
+        markers: {
+            width: 12,
+            height: 12,
+            radius: 12
+        }
+    },
+    grid: {
+        borderColor: '#333333',
+        strokeDashArray: 4,
+        xaxis: {
+            lines: {
+                show: true
+            }
+        },
+        yaxis: {
+            lines: {
+                show: true
+            }
+        },
+        row: {
+            colors: ['#2A2A2A', '#1E1E1E'], // Stripe effect pada background
+            opacity: 0.3
+        }
+    }
+};
+
+// Render chart
+var chart = new ApexCharts(document.querySelector("#dept_chart"), options);
+chart.render();            columnWidth: '50%',
             distributed: true // Memungkinkan warna berbeda per batang
         }
     },
